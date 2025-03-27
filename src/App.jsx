@@ -1,11 +1,9 @@
-import './App.css'
+import DroneMap from './DroneMap'
 
-function App() {
+export default function App() {
   return (
-    <div>
-      <h1>Hello World</h1>
+    <div className="app">
+      <DroneMap />
     </div>
   )
 }
-
-export default App
