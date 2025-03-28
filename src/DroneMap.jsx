@@ -1,22 +1,40 @@
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import './DroneMap.css'
 import L from 'leaflet';
 
-// Create a custom drone icon
 const createDroneIcon = (bearing) => {
   // Adjust rotation to align with SVG coordinate system
-  // Subtract 90° to align with north, and negate for clockwise rotation
   const rotation = -(bearing - 90);
-  
+
   return new L.DivIcon({
     className: 'drone-icon',
     html: `
-      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="transform: rotate(${rotation}deg)">
-        <!-- Dart shape with concave back -->
-        <path d="M32 4L20 32C20 32 24 44 32 44C40 44 44 32 44 32L32 4Z" fill="#FF4444"/>
-        <!-- Center dot -->
-        <circle cx="32" cy="32" r="6" fill="#FFFFFF"/>
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none"
+      xmlns="http://www.w3.org/2000/svg" style="transform: rotate(${rotation}deg)">
+        <g>
+          <!-- Left half of dart -->
+          <path
+            d="M4,60 L32,45 L32,4 Z"
+            fill="#2c3e50"
+            stroke="none"
+          />
+          <!-- Right half of dart (darker for 3D effect) -->
+          <path
+            d="M32,4 L32,45 L60,60 Z"
+            fill="#1a252f"
+            stroke="none"
+          />
+          <!-- Single consistent border around the entire shape -->
+          <path
+            d="M4,60 L32,45 L60,60 L32,4 Z"
+            fill="none"
+            stroke="#aaaaaa"
+            stroke-width="2"
+            stroke-linejoin="round"
+          />
+        </g>
       </svg>
     `,
     iconSize: [64, 64],
@@ -24,13 +42,11 @@ const createDroneIcon = (bearing) => {
   });
 };
 
-// Component to handle WebSocket connection and drone updates
 function DroneMarkers() {
   const [drones, setDrones] = useState([]);
 
   useEffect(() => {
-    // Connect to WebSocket server
-    const ws = new WebSocket('ws://localhost:8080');
+    const ws = new WebSocket('ws://localhost:8081');
 
     ws.onmessage = (event) => {
       const droneData = JSON.parse(event.data);
@@ -57,21 +73,16 @@ function DroneMarkers() {
 
 export default function DroneMap() {
   return (
-    <div style={{ width: '100%', height: '100%' }}>
-      <MapContainer
-        center={[47.5767, -122.3869]} // 47°34'36"N 122°23'13"W
-        zoom={13}
-        style={{ width: '100%', height: '100%' }}
-        scrollWheelZoom={true}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          maxZoom={19}
-          minZoom={1}
-        />
-        <DroneMarkers />
-      </MapContainer>
-    </div>
+    <MapContainer
+      center={[47.5767, -122.3869]}
+      zoom={13}
+      scrollWheelZoom={true}
+    >
+      <TileLayer
+        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+      />
+      <DroneMarkers />
+    </MapContainer>
   );
-} 
+}

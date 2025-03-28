@@ -5,7 +5,7 @@ const CENTER_LAT = 47.5767;
 const CENTER_LNG = -122.3869;
 
 // Create WebSocket server
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocket.Server({ port: 8081 });
 
 let simulationInterval;
 
